@@ -9,8 +9,8 @@ require 'usher/flags'
 require 'usher/mutable_flags'
 require 'usher/unpacker'
 require 'usher/packer'
-require 'usher/railties'
-require 'usher/engine'
+require 'usher/monkey_patches'
+require 'usher/railtie'
 
 module Usher
   PRIMITIVES  = [ Hash, Array, String, Fixnum, Float, TrueClass, FalseClass, NilClass ]

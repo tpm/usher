@@ -1,12 +1,22 @@
 # encoding: UTF-8
 
+require 'active_support/deprecation'
+require 'active_support/core_ext/object/blank'
+
 module Usher
-  module Railties
-    require 'active_support/base64'
-    require 'active_support/deprecation'
-    require 'active_support/core_ext/object/blank'
-     
-    module MessageVerifier
+  class MonkeyPatch < Module
+    private
+    def included(base)
+      base.module_eval(&@patch)
+    end
+
+    def initialize(&patch)
+      @patch = patch
+    end
+  end # MonkeyPatch
+
+  module MonkeyPatches
+    MessageVerifier = MonkeyPatch.new do
       def initialize(secret, options = {})
         unless options.is_a?(Hash)
           ActiveSupport::Deprecation.warn "The second parameter should be an options hash. Use :digest => 'algorithm' to specify the digest algorithm."
@@ -25,7 +35,7 @@ module Usher
         data = URI.decode(data) if data
         if data.present? && digest.present? && secure_compare(digest, generate_digest(data))
           begin
-            @serializer.load(::Base64.strict_decode64(data))
+            @serializer.load(::Base64.decode64(data))
           rescue ArgumentError => argument_error
             raise InvalidSignature if argument_error.message =~ %r{invalid base64}
             raise
@@ -59,12 +69,19 @@ module Usher
     end # MessageVerifier
      
     # Make signed cookies use Usher as serializer instead of Marshal
-    module SignedCookieJar
-      def initialize(parent_jar, secret)
-        ensure_secret_secure(secret)
+    SignedCookieJar = MonkeyPatch.new do
+      def initialize(parent_jar, secret, options = {})
+        if String === secret
+          ensure_secret_secure(secret)
+        else
+          @options = options
+          key_generator = secret
+          secret = key_generator.generate_key(@options[:signed_cookie_salt])
+        end
+        
         @parent_jar = parent_jar
-        @verifier   = ActiveSupport::MessageVerifier.new(secret, {:serializer => Usher})
+        @verifier   = ActiveSupport::MessageVerifier.new(secret, serializer: Usher)
       end
     end # SignedCookieJar
-  end # Railties
+  end # MonkeyPatches
 end # Usher
