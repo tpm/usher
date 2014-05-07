@@ -39,6 +39,8 @@ module Usher
           rescue ArgumentError => argument_error
             raise InvalidSignature if argument_error.message =~ %r{invalid base64}
             raise
+          rescue MessagePack::MalformedFormatError
+            {}
           end
         else
           raise InvalidSignature
