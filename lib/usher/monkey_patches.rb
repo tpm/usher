@@ -29,7 +29,7 @@ module Usher
       end
       
       def verify(signed_message)
-        raise InvalidSignature if signed_message.blank?
+        raise ActiveSupport::MessageVerifier::InvalidSignature if signed_message.blank?
       
         data, digest = signed_message.split("--")
         data = URI.decode(data) if data
@@ -37,13 +37,13 @@ module Usher
           begin
             @serializer.load(::Base64.decode64(data))
           rescue ArgumentError => argument_error
-            raise InvalidSignature if argument_error.message =~ %r{invalid base64}
+            raise ActiveSupport::MessageVerifier::InvalidSignature if argument_error.message =~ %r{invalid base64}
             raise
           rescue MessagePack::MalformedFormatError
             {}
           end
         else
-          raise InvalidSignature
+          raise ActiveSupport::MessageVerifier::InvalidSignature
         end
       end
       
