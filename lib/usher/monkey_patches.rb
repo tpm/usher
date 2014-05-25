@@ -25,7 +25,7 @@ module Usher
       
         @secret = secret
         @digest = options[:digest] || 'SHA1'
-        @serializer = options[:serializer] || Marshal
+        @serializer = options[:serializer] || Usher
       end
       
       def verify(signed_message)
@@ -82,7 +82,11 @@ module Usher
         end
         
         @parent_jar = parent_jar
-        @verifier   = ActiveSupport::MessageVerifier.new(secret, serializer: Usher)
+        @verifier   = ActiveSupport::MessageVerifier.new(secret, serializer: NullSerializer)
+      end
+
+      def serializer
+        Usher
       end
     end # SignedCookieJar
   end # MonkeyPatches
