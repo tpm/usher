@@ -17,5 +17,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", ">= 3.2"
   s.add_dependency "msgpack", "~> 0.5.8"
-  s.add_dependency "facets", "~> 2.9.3"
+  s.add_dependency "facets", "~> 3.0.0"
 end
