@@ -82,7 +82,7 @@ module Usher
         end
         
         @parent_jar = parent_jar
-        @verifier   = ActiveSupport::MessageVerifier.new(secret, serializer: ActionDispatch::Cookies::NullSerializer)
+        @verifier   = ActiveSupport::MessageVerifier.new(secret, serializer: ActiveSupport::MessageEncryptor::NullSerializer)
       end
 
       def serializer
