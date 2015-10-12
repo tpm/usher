@@ -82,7 +82,10 @@ module Usher
         end
         
         @parent_jar = parent_jar
-        @verifier = ActiveSupport::MessageVerifier.new(secret, serializer: ActionDispatch::Cookies::NullSerializer)
+        @verifier = ActiveSupport::MessageVerifier.new(
+          secret,
+          serializer: Usher.null_serializer
+        )
       end
 
       def serializer
@@ -90,4 +93,10 @@ module Usher
       end
     end # SignedCookieJar
   end # MonkeyPatches
+
+  def self.null_serializer
+    ActiveSupport::MessageEncryptor::NullSerializer
+  rescue NameError => e
+    ActiveSupport::Cookies::NullSerializer
+  end
 end # Usher
