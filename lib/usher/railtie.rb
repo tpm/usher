@@ -4,5 +4,5 @@ module Usher
       ActiveSupport::MessageVerifier.send(:include, MonkeyPatches::MessageVerifier)
       ActionDispatch::Cookies::SignedCookieJar.send(:include, MonkeyPatches::SignedCookieJar)
     end
-  end
+  end if defined?(Rails)
 end
