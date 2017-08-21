@@ -23,4 +23,9 @@ module Usher
   def self.dump(object)
     Packer.new(object).pack
   end
+
+  class << self
+    alias_method :decode, :load
+    alias_method :encode, :dump
+  end # self
 end
